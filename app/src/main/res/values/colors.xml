@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#FFA000</color>
+    <color name="colorPrimaryDark">#FFA000</color>
+    <color name="colorAccent">#536DFE</color>
+    <color name="lightPrimaryColor">#FFECB3</color>
+    <color name="text">#212121</color>
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#727272</color>
+    <color name="dividerColor">#B6B6B6</color>
+    <color name="parkirkosong">#3ec216</color>
+    <color name="parkirbooking">#ffff10</color>
+    <color name="parkirterisi">#ff3700</color>
+</resources>

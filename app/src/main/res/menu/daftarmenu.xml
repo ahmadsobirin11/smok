@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<group android:checkableBehavior="single"
+    android:id="@+id/grup1">
+    <item
+        android:id="@+id/id_menu_home"
+        android:title="Home"
+        android:icon="@drawable/home"
+    />
+    <item
+        android:id="@+id/id_menu_saldo"
+        android:title="Isi Saldo"
+        android:icon="@drawable/money"
+    />
+    <item
+        android:id="@+id/id_menu_logout"
+        android:title="Logout"
+        android:icon="@drawable/logout"
+    />
+    <item
+        android:id="@+id/id_menu_help"
+        android:title="Help"
+        android:icon="@drawable/help"
+        />
+    <item
+        android:id="@+id/id_menu_about"
+        android:title="About"
+        android:icon="@drawable/about"
+        />
+</group>
+
+</menu>
