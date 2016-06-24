@@ -29,16 +29,10 @@ public class splash extends AppCompatActivity {
                 // TODO Auto-generated method stub
                 Intent i = new Intent(splash.this, LoginActivity.class);
                 startActivity(i); // menghubungkan activity splashscren ke main activity dengan intent
-
-
-                //jeda selesai Splashscreen
-                this.finish();
+                finish();
             }
 
-            private void finish() {
-                // TODO Auto-generated method stub
 
-            }
         }, splashInterval);
 
     };

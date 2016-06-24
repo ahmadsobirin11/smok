@@ -55,10 +55,11 @@
             android:layout_height="wrap_content"
             android:inputType="number"
             android:ems="10"
-            android:id="@+id/editText3"
+            android:id="@+id/edt_kodevoucher"
             android:hint="Kode Voucher"
             android:textColorHint="@color/text"
-            android:layout_marginTop="65dp" />
+            android:layout_marginTop="65dp"
+            />
 </android.support.design.widget.TextInputLayout>
         <Button
             android:layout_width="match_parent"
@@ -66,7 +67,8 @@
             android:text="Submit"
             android:id="@+id/button11"
             android:layout_below="@+id/editText3"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:onClick="klikIsiVoucher"/>
         </LinearLayout>
     </LinearLayout>
     <android.support.design.widget.NavigationView

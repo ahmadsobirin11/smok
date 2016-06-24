@@ -47,7 +47,7 @@
         android:text="BOOKING P1"
         android:layout_marginLeft="12dp"
         android:id="@+id/textView11"
-        android:textSize="35dp"
+        android:textSize="30dp"
         android:textColor="@color/text"
         />
 
@@ -71,7 +71,7 @@
         android:id="@+id/textView9"
         android:textColor="@color/text"
         android:layout_marginTop="5dp"
-
+        android:padding="10dp"
         />
 
     <TextView
@@ -92,6 +92,7 @@
         android:text="Akhir Boking :"
         android:id="@+id/text"
         android:textColor="@color/text"
+        android:padding="10dp"
         />
 
     <TextView
