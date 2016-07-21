@@ -92,8 +92,6 @@ public void klikDaftar(View v){
             .add("no_plat",strplat)
             .add("email",email)
             .add("password",password)
-            .add("merk","honda")
-            .add("tipe","Jazz")
             .build();
     final ProgressDialog alertDialog = new ProgressDialog(this);
     alertDialog.setMessage("LOADING");
@@ -141,8 +139,7 @@ public void klikDaftar(View v){
     } catch (IOException e) {
         e.printStackTrace();
     }
-    Intent i = new Intent(ProfileActivity.this, UpasActivity.class);
-    startActivity(i); // menghubungkan activity splashscren ke main activity dengan intent
+
 }
     private void inisialisasiJenisMobil() {
         jenis.add(new JenisMobil("Honda","Jazz"));

@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.smok.ahmad.smok.utility.OkHttpRequest;
+import com.smok.ahmad.smok.utility.SessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -53,13 +55,15 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity  {
-Button btnLogin;
-FormBody formBody;
+    Button btnLogin;
+    FormBody formBody;
     EditText email,password;
     boolean hasil ;
     String url = "http://smokdummy.azurewebsites.net/login.php";
-
+    SessionManager session;
     // UI references.
+    String idUser,nama,urlfoto;
+    int pulsa;
 
     /*private  TextView blmlogin;*/
     @Override
@@ -67,7 +71,7 @@ FormBody formBody;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
-deklarasiWidget();
+    deklarasiWidget();
 
     }
 
@@ -102,13 +106,28 @@ deklarasiWidget();
                         int kode = object.getInt("kode");
                         Log.i("request data",String.valueOf(kode));
                         if(kode == 200){
-                            finish();
-                            Intent intent = new Intent(getApplicationContext(),UpasActivity.class);
-                            startActivity(intent);
+                            idUser = object.getString("id_user");
+                            nama = object.getString("nama");
+                            urlfoto = object.getString("url_foto");
+                            pulsa = object.getInt("saldo");
+
                             LoginActivity.this.runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     alertDialog.dismiss();
+                                    session = new SessionManager(getApplicationContext());
+                                    session.createLoginSession(idUser,nama,urlfoto,pulsa);
+
+                                    SharedPreferences pref = getApplicationContext().getSharedPreferences("SmartMobileParkingPref",MODE_PRIVATE);
+                                    Log.i("hasil contain",String.valueOf(pref.contains(SessionManager.KEY_IDUSER)));
+
+                                    Intent intent = new Intent(getApplicationContext(),UpasActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                                    // Add new Flag to start new Activity
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    startActivity(intent);
+                                    finish();
                                 }
                             });
                         }else{

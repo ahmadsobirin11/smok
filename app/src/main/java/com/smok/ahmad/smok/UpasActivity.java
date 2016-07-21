@@ -1,6 +1,8 @@
 package com.smok.ahmad.smok;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,13 +15,20 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.firebase.client.core.Context;
 import com.smok.ahmad.smok.model.ModelTempat;
+import com.smok.ahmad.smok.utility.SessionManager;
+import com.squareup.picasso.Picasso;
+
+import java.util.HashMap;
 
 public class UpasActivity extends AppCompatActivity {
     private Button isisaldo,buttonP1,buttonP2,buttonP3,buttonP4,buttonP5,buttonP6,buttonP7,buttonP8,buttonP9,buttonP10;
@@ -30,6 +39,7 @@ public class UpasActivity extends AppCompatActivity {
     Firebase firebase;
     boolean kondisiP1,kondisiP2,kondisiP3,kondisiP4,kondisiP5,kondisiP6,kondisiP7,kondisiP8,kondisiP9,kondisiP10;
     public static String posisi;
+    SessionManager session;
 
     @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +51,19 @@ public class UpasActivity extends AppCompatActivity {
         deklarasiTempat();
         setupFirebase();
         setupKlikTempat();
+        session = new SessionManager(getApplicationContext());
+        session.checkLogin();
+        // get user data from session
+        HashMap<String, String> user = session.getUserDetails();
+        int pulsa = Integer.parseInt(user.get(SessionManager.KEY_pulsa));
+        String nama = user.get(SessionManager.KEY_NAMAUSER);
+        String urlfoto = user.get(SessionManager.KEY_urlfoto);
+        ImageView foto = (ImageView) findViewById(R.id.header_foto);
+        TextView namauser = (TextView) findViewById(R.id.header_nama);
+        TextView saldouser = (TextView) findViewById(R.id.header_saldo);
+        namauser.setText(nama);
+        saldouser.setText(String.valueOf(pulsa));
+        Picasso.with(this).load(urlfoto).into(foto);
     }
 
 
@@ -373,9 +396,37 @@ public class UpasActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             case R.id.id_menu_logout:
-                intent = new Intent(getApplicationContext(),LoginActivity.class);
-                startActivity(intent);
-                finish();
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(UpasActivity.this);
+
+                // Setting Dialog Title
+                alertDialog.setTitle("Keluar.");
+
+                // Setting Dialog Message
+                alertDialog.setMessage("Apakah anda yakin ingin keluar?");
+
+
+
+                // Setting Positive "Yes" Button
+                alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int which) {
+                        session.logoutUser();
+                        Intent intent = new Intent(getApplicationContext(),LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+
+                // Setting Negative "NO" Button
+                alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.cancel();
+                    }
+                });
+
+                // Showing Alert Message
+                alertDialog.show();
+
                 return true;
             default:
                 return true;

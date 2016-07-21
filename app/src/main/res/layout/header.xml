@@ -10,6 +10,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/avatar"
+        android:id="@+id/header_foto"
         app:border_width="2dp"
         app:border_color="@color/text"
         />
@@ -18,6 +19,7 @@
         android:layout_height="wrap_content"
         android:textSize="20dp"
         android:text="Ahmad Sobirin"
+        android:id="@+id/header_nama"
         android:textColor="@color/text"
         android:textStyle="bold"
         android:layout_marginTop="10dp"/>
@@ -26,6 +28,7 @@
         android:layout_height="wrap_content"
         android:textSize="15dp"
         android:text="Saldo Anda, 30.000"
+        android:id="@+id/header_saldo"
         android:textColor="@color/text"
         android:textStyle="bold"
         android:layout_marginTop="10dp"/>

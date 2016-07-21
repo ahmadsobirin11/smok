@@ -1,6 +1,8 @@
 package com.smok.ahmad.smok;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -16,11 +18,16 @@ import android.widget.Toast;
 import com.firebase.client.Firebase;
 import com.smok.ahmad.smok.model.ModelTempat;
 import com.smok.ahmad.smok.utility.OkHttpRequest;
+import com.smok.ahmad.smok.utility.SessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.HashMap;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -29,7 +36,7 @@ import okhttp3.Response;
 
 public class WaktuActivity extends AppCompatActivity {
     Toolbar toolbar;
-    TextView timer;
+    TextView timer,kodeUnik;
     Button btnSelesai;
     private long startTime = 0L;
     private Handler customHandler = new Handler();
@@ -50,68 +57,114 @@ public class WaktuActivity extends AppCompatActivity {
         firebase = new Firebase("https://samplesmok.firebaseio.com/");
         startTime = SystemClock.uptimeMillis();
         customHandler.postDelayed(updateTimerThread, 1);
+        kodeUnik.setText(BookingActivity.kodeUnik);
     }
 
     public void klikSelesai(View v){
-        formBody = new FormBody.Builder()
-                .add("id_user","1")
-                .add("kode_unik","123")
-                .build();
-        final ProgressDialog alertDialog = new ProgressDialog(this);
-        alertDialog.setMessage("LOADING");
-        alertDialog.setCancelable(true);
-        alertDialog.show();
-        ModelTempat modelTempat = new ModelTempat(0);
-        firebase.child(UpasActivity.posisi).setValue(modelTempat);
-        try {
-            OkHttpRequest.postDataToServer(url,formBody).enqueue(new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    Log.e("Error : ",e.getMessage());
-                    alertDialog.dismiss();
-                }
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(WaktuActivity.this);
 
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    try {
-                        JSONObject object = new JSONObject(response.body().string());
-                        int kode = object.getInt("kode");
-                        Log.i("request data",String.valueOf(kode));
-                        if (kode == 200){
-                            finish();
-                            Intent intent = new Intent(getApplicationContext(),UpasActivity.class);
-                            startActivity(intent);
-                            WaktuActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog.dismiss();
-                                }
-                            });
-                        }else{
-                            WaktuActivity.this.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    alertDialog.dismiss();
-                                    Toast.makeText(getApplicationContext(),"Login Gagal", Toast.LENGTH_LONG).show();
-                                }
-                            });
+        // Setting Dialog Title
+        alertDialog.setTitle("Keluar");
+
+        // Setting Dialog Message
+        alertDialog.setMessage("Apakah anda yakin ingin keluar?");
+
+        // Setting Positive "Yes" Button
+        alertDialog.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog,int which) {
+                dialog.cancel();
+                final SessionManager sessionManager = new SessionManager(getApplicationContext());
+                HashMap<String,String> mapUser= sessionManager.getUserDetails();
+
+                DateFormat formatDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Calendar cal = Calendar.getInstance();
+                Log.i("tanggal sekarang",String.valueOf(formatDate.format(cal.getTime())));
+
+                long waktusekarang = cal.getTimeInMillis();
+                long durasi = (waktusekarang-BookingActivity.waktu)/1000/60/60;
+                int biaya = (int) ((durasi *3000)+3000);
+                final int sisapulsa = Integer.valueOf(mapUser.get(SessionManager.KEY_pulsa))-biaya;
+
+                formBody = new FormBody.Builder()
+                        .add("id_user",mapUser.get(SessionManager.KEY_IDUSER))
+                        .add("kode_unik",BookingActivity.kodeUnik)
+                        .add("waktu_keluar",String.valueOf(formatDate.format(cal.getTime())))
+                        .add("durasi",String.valueOf(durasi))
+                        .build();
+                final ProgressDialog alertDialog = new ProgressDialog(WaktuActivity.this);
+                alertDialog.setMessage("LOADING");
+                alertDialog.setCancelable(true);
+                alertDialog.show();
+                ModelTempat modelTempat = new ModelTempat(0);
+                firebase.child(UpasActivity.posisi).setValue(modelTempat);
+                try {
+                    OkHttpRequest.postDataToServer(url,formBody).enqueue(new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
+                            Log.e("Error : ",e.getMessage());
+                            alertDialog.dismiss();
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            try {
+                                JSONObject object = new JSONObject(response.body().string());
+                                int kode = object.getInt("kode");
+                                Log.i("request data",String.valueOf(kode));
+
+                                if (kode == 200){
+                                    sessionManager.updatePulsa(sisapulsa);
+                                    Intent intent = new Intent(getApplicationContext(),UpasActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                    WaktuActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            alertDialog.dismiss();
+                                        }
+                                    });
+                                }else{
+                                    WaktuActivity.this.runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            alertDialog.dismiss();
+                                            Toast.makeText(getApplicationContext(),"Login Gagal", Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+
+                        }
+                    });
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // Setting Negative "NO" Button
+        alertDialog.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.cancel();
+            }
+        });
+
+        // Showing Alert Message
+        alertDialog.show();
+
                     }
 
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
     private void deklarasiWidget() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         timer = (TextView) findViewById(R.id.timer);
         btnSelesai = (Button) findViewById(R.id.btn_selesai);
+        kodeUnik = (TextView) findViewById(R.id.txtKodeUnik);
+
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("");
     }
     private Runnable updateTimerThread = new Runnable() {
@@ -133,4 +186,5 @@ public class WaktuActivity extends AppCompatActivity {
         }
 
     };
+
 }

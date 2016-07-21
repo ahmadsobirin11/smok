@@ -114,14 +114,7 @@
             android:textColor="#FFFFFF"
             android:textStyle="bold"
             android:onClick="klikSelesai"/>
-         <Button
-             android:layout_width="match_parent"
-             android:layout_height="wrap_content"
-             android:text="Tambah Waktu"
-             android:layout_margin="5dp"
-             android:layout_weight="1"
-             android:background="#3cff00"
-             android:textStyle="bold"/>
+
      </LinearLayout>
         <TextView
             android:layout_width="match_parent"
@@ -132,6 +125,7 @@
             android:gravity="center"
             android:layout_marginTop="10dp"/>
         <TextView
+            android:id="@+id/txtKodeUnik"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
